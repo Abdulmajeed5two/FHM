@@ -1,64 +1,122 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import 'material-design-iconic-font/dist/css/material-design-iconic-font.min.css';
+import styles from './style/Sidebar.module.css';
+import { useNavigate } from 'react-router-dom';
 
-const Sidebar = ({ logout }) => {
-  const [employeeOpen, setEmployeeOpen] = useState(false);
-  const [reservationOpen, setReservationOpen] = useState(false);
+const Sidebar = ({ setActiveComponent }) => {
+  const [rooms, setRooms] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [role, setRole] = useState(localStorage.getItem('role'));
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await axios.get('http://localhost:5200/rooms');
+        setRooms(res.data);
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/login');
+  };
 
   return (
-    <div className="w-64 bg-gray-900 text-white h-screen p-4 flex flex-col space-y-6">
-      <div className="flex items-center mb-6">
-        <img src="#" alt="Logo" className="w-10 h-10 rounded-full mr-2" />
-        <h2 className="text-2xl">Admin Panel</h2>
+    <div className={styles.sidebar}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>{role === 'admin' ? 'Admin Panel' : 'Staff Panel'}</h2>
       </div>
-      <ul className="space-y-4">
-        <li>
-          <Link to="/admin" className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-            <i className="fas fa-home"></i>
+      <ul className={styles.navList}>
+        <li className={styles.navItem}>
+          <button 
+            onClick={() => setActiveComponent('dashboard')}
+            className={styles.button}
+          >
+            <i className={`${styles.icon} zmdi zmdi-home zmdi-hc-lg`}></i>
             <span>Dashboard</span>
-          </Link>
-        </li>
-        <li>
-          <button onClick={() => setEmployeeOpen(!employeeOpen)} className="w-full text-left flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-            <i className="fas fa-users"></i>
-            <span>Employee</span>
-            <i className={`fas fa-chevron-${employeeOpen ? 'up' : 'down'} ml-auto`}></i>
           </button>
-          {employeeOpen && (
-            <ul className="ml-6 mt-2 space-y-2">
-              <li>
-                <Link to="/manage-users" className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-                  <span>Manage Users</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/staff" className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-                  <span>Staff Panel</span>
-                </Link>
-              </li>
-            </ul>
-          )}
         </li>
-        <li>
-          <button onClick={() => setReservationOpen(!reservationOpen)} className="w-full text-left flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-            <i className="fas fa-calendar-alt"></i>
-            <span>Rooms</span>
-            <i className={`fas fa-chevron-${reservationOpen ? 'up' : 'down'} ml-auto`}></i>
+        <li className={styles.navItem}>
+          <button 
+            onClick={() => setActiveComponent('roomReservation')}
+            className={styles.button}
+          >
+            <i className={`${styles.icon} zmdi zmdi-calendar-check zmdi-hc-lg`}></i>
+            <span>Room Reservation</span>
           </button>
-          {reservationOpen && (
-            <ul className="ml-6 mt-2 space-y-2">
-              <li>
-                <Link to="/reservation" className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-                  <span>Room Reservations</span>
-                </Link>
-              </li>
-
-            </ul>
-          )}
         </li>
-        <li>
-          <button onClick={logout} className="w-full text-left flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-800">
-            <i className="fas fa-sign-out-alt"></i>
+        <li className={styles.navItem}>
+          <div>
+            <button 
+              onClick={toggleDropdown}
+              className={styles.button}
+            >
+              <i className={`${styles.icon} zmdi zmdi-hotel zmdi-hc-lg`}></i>
+              <span>Rooms</span>
+              <i className={`zmdi zmdi-caret-${isDropdownOpen ? 'up' : 'down'} zmdi-hc-lg ml-auto`}></i>
+            </button>
+            <div className={`${styles.dropdown} ${isDropdownOpen ? styles.dropdownOpen : ''}`}>
+              <ul className={styles.dropdownList}>
+                <li className={styles.dropdownItem}>
+                  <button 
+                    onClick={() => setActiveComponent('addRoom')}
+                    className={styles.dropdownButton}
+                  >
+                    <i className={`${styles.icon} zmdi zmdi-plus zmdi-hc-lg`}></i>
+                    <span>Add Room</span>
+                  </button>
+                </li>
+                {rooms.map(room => (
+                  <li key={room._id} className={styles.dropdownItem}>
+                    <button 
+                      onClick={() => setActiveComponent('roomDetails')}
+                      className={styles.dropdownButton}
+                    >
+                      <i className={`${styles.icon} zmdi zmdi-hotel zmdi-hc-lg`}></i>
+                      <span>{room.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li className={styles.navItem}>
+          <button 
+            onClick={() => setActiveComponent('staffDetails')}
+            className={styles.button}
+          >
+            <i className={`${styles.icon} zmdi zmdi-accounts zmdi-hc-lg`}></i>
+            <span>Staff Details</span>
+          </button>
+        </li>
+        <li className={styles.navItem}>
+          <button 
+            onClick={() => setActiveComponent('inventory')}
+            className={styles.button}
+          >
+            <i className={`${styles.icon} zmdi zmdi-store zmdi-hc-lg`}></i>
+            <span>Inventory Management</span>
+          </button>
+        </li>
+        <li className={styles.navItem}>
+          <button 
+            onClick={logout} 
+            className={styles.button}
+          >
+            <i className={`${styles.icon} zmdi zmdi-power zmdi-hc-lg`}></i>
             <span>Logout</span>
           </button>
         </li>

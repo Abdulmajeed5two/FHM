@@ -1,0 +1,93 @@
+/* Topbar.module.css */
+
+.topbar {
+    background-color: var(--color-primary);
+    transition: background-color 0.3s ease;
+  }
+  
+  .topbar.dark {
+    background-color: var(--color-dark);
+  }
+  
+  .topbarContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .button {
+    color: var(--color-text-light);
+    margin-right: 1rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .button:hover {
+    background-color: var(--color-primary-hover);
+    color: var(--color-text-dark);
+  }
+  
+  .notificationIcon {
+    position: relative;
+  }
+  
+  .notificationBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--color-accent);
+    color: var(--color-text-light);
+    font-size: 0.75rem;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    width: 12rem;
+    background-color: var(--color-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: top right;
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  
+  .dropdownOpen {
+    transform: scale(1);
+    opacity: 1;
+  }
+  
+  .dropdownItem {
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdownItem:hover {
+    background-color: var(--color-bg-hover);
+  }
+  
+  .dropdownItem a {
+    color: var(--color-text-dark);
+    text-decoration: none;
+  }
+  
+  .dropdownItem a:hover {
+    color: var(--color-text-light);
+  }
+  

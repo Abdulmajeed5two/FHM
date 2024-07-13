@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'material-design-iconic-font/dist/css/material-design-iconic-font.min.css';
+import gsap from 'gsap';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,13 @@ const Register = () => {
     role: '',
     password: ''
   });
+
+  const registerRef = useRef(null);
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    gsap.fromTo(registerRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,8 +34,11 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5200/register', formData);
+      await axios.post('http://localhost:5200/auth/register', formData);
       toast.success('User registered. Waiting for approval.');
+      setTimeout(() => {
+        navigate('/login'); 
+      }, 2000);
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
         toast.error(err.response.data.message);
@@ -38,11 +49,11 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-no-repeat flex items-center justify-center" style={{ backgroundImage: "url('src/assets/Auth/bgg.jpg')" }}>
+    <div ref={registerRef} className="min-h-screen bg-cover bg-no-repeat flex items-center justify-center" style={{ backgroundImage: "url('src/assets/Auth/bgr.jpg')" }}>
       <ToastContainer />
       <div className="bg-white max-w-4xl mx-auto flex shadow-lg">
         <div className="w-1/2">
-          <img src="src/assets/Auth/f.jpg" alt="registration" className="w-full h-full object-cover" />
+          <img src="src/assets/Auth/rr.jpg" alt="registration" className="w-full h-full object-cover" />
         </div>
         <form onSubmit={handleSubmit} className="w-1/2 p-10 flex flex-col justify-center">
           <h3 className="text-2xl font-semibold text-center mb-7 uppercase">Registration Form</h3>
@@ -106,9 +117,6 @@ const Register = () => {
             >
               <option value="" disabled>Role</option>
               <option value="admin">Admin</option>
-              <option value="receptionist">Receptionist</option>
-              <option value="cleaner">Cleaner</option>
-              <option value="plumber">Plumber</option>
               <option value="staff">Staff</option>
             </select>
             <i className="absolute bottom-2 right-0 transition-transform duration-300 transform group-hover:scale-110" style={{ fontSize: '17px' }}></i>
@@ -131,7 +139,7 @@ const Register = () => {
           </button>
           <div className="mt-10 text-center">
             <p>Already have an account?
-              <Link to="/" className="text-black underline ml-1">Login</Link>
+              <Link to="/login" className="text-black underline ml-1">Login</Link>
             </p>
           </div>
         </form>

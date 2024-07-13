@@ -1,107 +1,73 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
-import UserTable from './components/UserTable';
-import ReservationForm from './components/Reservation';
+import DashboardCard from './components/DashboardCard';
+import ReservationForm from './components/ReservationForm';
+import RoomDetails from './components/RoomDetails';
+import StaffDetails from './components/StaffDetails';
+import Inventory from './components/Inventory';
+import AddRoom from './components/AddRoom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import RoomReservation from './components/RoomReservation';
 
 const AdminPanel = () => {
-  const [users, setUsers] = useState([]);
-  const [showReservationForm, setShowReservationForm] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ room: '', date: '', time: '' });
-  const [error, setError] = useState(null);
+  const [activeComponent, setActiveComponent] = useState('dashboard');
+  const [dashboardData, setDashboardData] = useState({ totalAmount: 0, reservedRooms: 0, availableRooms: 0, totalRooms: 0 });
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const res = await axios.get('http://localhost:5200/users');
-        setUsers(res.data);
+        const res = await axios.get('http://localhost:5200/dashboard');
+        setDashboardData(res.data);
       } catch (err) {
-        console.error("Error fetching users:", err);
-        setError("Failed to fetch users. Please try again later.");
+        console.error("Error fetching dashboard data:", err);
       }
     };
 
-    fetchUsers();
+    fetchDashboardData();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const renderActiveComponent = () => {
+    const componentStyle = "mt-4";
 
-  const handleReservationSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:5200/reserve-room', formData);
-      setShowModal(false);
-      setFormData({ room: '', date: '', time: '' });
-    } catch (err) {
-      console.error("Error reserving room:", err);
-      setError("Failed to reserve room. Please try again later.");
+    switch (activeComponent) {
+      case 'dashboard':
+        return (
+          <div className={componentStyle}>
+            <h2 className="text-2xl mb-12">Dashboard</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <DashboardCard title="Total Amount" value={`$${dashboardData.totalAmount}`} />
+              <DashboardCard title="Total Rooms" value={dashboardData.totalRooms} />
+              <DashboardCard title="Reserved Rooms" value={dashboardData.reservedRooms} />
+              <DashboardCard title="Available Rooms" value={dashboardData.availableRooms} />
+            </div>
+          </div>
+        );
+      case 'roomReservation':
+        return <div className={componentStyle}><RoomReservation/></div>;
+      case 'roomDetails':
+        return <div className={componentStyle}><RoomDetails /></div>;
+      case 'staffDetails':
+        return <div className={componentStyle}><StaffDetails /></div>;
+      case 'inventory':
+        return <div className={componentStyle}><Inventory /></div>;
+      case 'addRoom':
+        return <div className={componentStyle}><AddRoom /></div>;
+      default:
+        return null;
     }
-  };
-
-  const approveUser = async (username) => {
-    try {
-      await axios.post('http://localhost:5200/approve', { username });
-      setUsers(users.map(user => user.username === username ? { ...user, isApproved: true } : user));
-    } catch (err) {
-      console.error("Error approving user:", err);
-      setError("Failed to approve user. Please try again later.");
-    }
-  };
-
-  const deleteUser = async (username) => {
-    try {
-      await axios.delete('http://localhost:5200/delete-user', { data: { username } });
-      setUsers(users.filter(user => user.username !== username));
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      setError("Failed to delete user. Please try again later.");
-    }
-  };
-
-  const setPending = async (username) => {
-    try {
-      await axios.post('http://localhost:5200/set-pending', { username });
-      setUsers(users.map(user => user.username === username ? { ...user, isApproved: false } : user));
-    } catch (err) {
-      console.error("Error setting user to pending:", err);
-      setError("Failed to set user to pending. Please try again later.");
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    window.location.href = '/login';
   };
 
   return (
-    <div className="flex">
-      <Sidebar setShowReservationForm={setShowReservationForm} logout={logout} />
-      <div className="flex-1">
+    <div className="flex h-screen">
+      <Sidebar setActiveComponent={setActiveComponent} />
+      <div className="flex-1 flex flex-col">
         <Topbar />
-        <div className="p-4">
-          {error && <p className="error text-red-500">{error}</p>}
-          {!showReservationForm ? (
-            <UserTable users={users} approveUser={approveUser} setPending={setPending} deleteUser={deleteUser} />
-          ) : (
-            <>
-              <h2 className="text-2xl mb-4">Room Reservations</h2>
-              <button onClick={() => setShowModal(true)} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">Add Room Reservation</button>
-              {showModal && (
-                <ReservationForm
-                  formData={formData}
-                  handleInputChange={handleInputChange}
-                  handleReservationSubmit={handleReservationSubmit}
-                  setShowModal={setShowModal}
-                />
-              )}
-            </>
-          )}
+        <div className="flex-1 p-4 ml-64">
+          <ToastContainer />
+          {renderActiveComponent()}
         </div>
       </div>
     </div>
@@ -109,4 +75,3 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
-``

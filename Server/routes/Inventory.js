@@ -4,7 +4,7 @@ const Inventory = require('../models/Inventory');
 
 const router = express.Router();
 
-// Add an inventory item
+
 router.post('/add-item', authMiddleware(['admin']), async (req, res) => {
   const { itemName, quantity, roomNo } = req.body;
   const newItem = new Inventory({ itemName, quantity, roomNo });
@@ -12,13 +12,13 @@ router.post('/add-item', authMiddleware(['admin']), async (req, res) => {
   res.status(201).json({ message: 'Item added to inventory successfully.' });
 });
 
-// Get all inventory items
+
 router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   const items = await Inventory.find();
   res.json(items);
 });
 
-// Update inventory item
+
 router.put('/update-item/:id', authMiddleware(['admin']), async (req, res) => {
   const { id } = req.params;
   const { quantity } = req.body;

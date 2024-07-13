@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Add Room
+
 router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
   const { roomNo, type } = req.body;
   const room = new Room({ roomNo, type });
@@ -14,7 +14,7 @@ router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
   res.status(201).json({ message: 'Room added successfully.' });
 });
 
-// Get Dashboard Data
+
 router.get('/dashboard', authMiddleware(['admin']), async (req, res) => {
   const totalRooms = await Room.countDocuments();
   const reservedRooms = await Room.countDocuments({ status: 'reserved' });
@@ -22,7 +22,7 @@ router.get('/dashboard', authMiddleware(['admin']), async (req, res) => {
   res.json({ totalRooms, reservedRooms, availableRooms });
 });
 
-// Reserve Room
+
 router.post('/reserve-room', authMiddleware(['admin', 'staff']), async (req, res) => {
   const { roomId } = req.body;
   const room = await Room.findById(roomId);
@@ -35,7 +35,7 @@ router.post('/reserve-room', authMiddleware(['admin', 'staff']), async (req, res
   }
 });
 
-// Add Inventory
+
 router.post('/add-inventory', authMiddleware(['admin']), async (req, res) => {
   const { roomId, item, quantity } = req.body;
   const inventory = new Inventory({ room: roomId, item, quantity });
@@ -43,7 +43,6 @@ router.post('/add-inventory', authMiddleware(['admin']), async (req, res) => {
   res.json({ message: 'Inventory item added successfully.' });
 });
 
-// Get Inventory
 router.get('/inventory', authMiddleware(['admin', 'staff']), async (req, res) => {
   const inventory = await Inventory.find().populate('room');
   res.json(inventory);

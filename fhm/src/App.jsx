@@ -7,7 +7,6 @@ import AdminRoutes from './Admin/AdminRoutes';
 import StaffRoutes from './Staff/StaffRoutes';
 import WaitingList from './components/WaitingList';
 import Loader from './components/Loader';
-import './App.css';
 
 const App = () => {
   const location = useLocation();

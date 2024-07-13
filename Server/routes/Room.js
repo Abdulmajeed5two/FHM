@@ -4,11 +4,9 @@ const Room = require('../models/Room');
 
 const router = express.Router();
 
-// Add a new room
 router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
   const { roomNo, type } = req.body;
 
-  // Validate input
   if (!roomNo || !type) {
     return res.status(400).json({ message: 'Room number and type are required.' });
   }
@@ -23,7 +21,6 @@ router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
   }
 });
 
-// Get all rooms
 router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
     const rooms = await Room.find();
@@ -34,6 +31,5 @@ router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   }
 });
 
-// Other routes (e.g., reserve, check-in, check-out) can be added here...
 
 module.exports = router;

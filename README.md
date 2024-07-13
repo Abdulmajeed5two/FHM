@@ -1,13 +1,12 @@
 Farmhouse Manager 
 Login Screen
-![Screenshot 2024-07-05 195057](https://github.com/Abdulmajeed5two/FHM/assets/158247055/e6046057-2fb9-4c43-aaff-2a9220530d87)
+![Screenshot 2024-07-13 132335](https://github.com/user-attachments/assets/9e54204d-b11b-4db2-810c-cda5865765ed)
+
 
 Register Screen
-![Screenshot 2024-07-05 195112](https://github.com/Abdulmajeed5two/FHM/assets/158247055/b1aa725f-e949-4f61-8e06-6d28150ff836)
+![Screenshot 2024-07-13 132431](https://github.com/user-attachments/assets/593f7fe2-1ed1-40ed-ad60-c2a512c92cf2)
+
 
 Admin panel
-![Screenshot 2024-07-05 195035](https://github.com/Abdulmajeed5two/FHM/assets/158247055/ce571078-55b6-4eb6-bd09-0f6939332a74)
+![Screenshot 2024-07-13 132545](https://github.com/user-attachments/assets/d0fcc1b2-c6fd-421c-856d-1a15b5cd3912)
 
-Staff Panel
-
-![Screenshot 2024-07-05 195145](https://github.com/Abdulmajeed5two/FHM/assets/158247055/0b8d318e-19c2-4fc8-ae6f-7d32e2523730)

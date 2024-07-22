@@ -4,22 +4,24 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+
 router.get('/profile', authMiddleware(['admin', 'receptionist', 'staff']), async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password'); 
+    const user = await User.findById(req.userId).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
-    res.json({ username: user.username, email: user.email, role: user.role }); 
+    res.json({ username: user.username, email: user.email, role: user.role });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ message: 'Failed to fetch user profile.' });
   }
 });
 
+
 router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
-    const users = await User.find().select('-password'); 
+    const users = await User.find().select('-password');
     res.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -27,9 +29,10 @@ router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   }
 });
 
+
 router.get('/:id', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password'); 
+    const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }

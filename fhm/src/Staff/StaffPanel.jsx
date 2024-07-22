@@ -8,29 +8,10 @@ import RoomReservation from '../Admin/components/RoomReservation';
 import AddRoom from '../Admin/components/AddRoom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import DashboardCard from '../Admin/components/DashboardCard';
 
 const StaffPanel = () => {
   const [activeComponent, setActiveComponent] = useState('dashboard');
-  const [dashboardData, setDashboardData] = useState({
-    totalAmount: 0,
-    reservedRooms: 0,
-    availableRooms: 0,
-    totalRooms: 0,
-  });
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const res = await axios.get('http://localhost:5200/dashboard');
-        setDashboardData(res.data);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
 
   const renderActiveComponent = () => {
     const componentStyle = "mt-4";
@@ -40,12 +21,6 @@ const StaffPanel = () => {
         return (
           <div className={componentStyle}>
             <h2 className="text-2xl mb-12">Dashboard</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-              <DashboardCard title="Total Amount" value={`$${dashboardData.totalAmount}`} />
-              <DashboardCard title="Total Rooms" value={dashboardData.totalRooms} />
-              <DashboardCard title="Reserved Rooms" value={dashboardData.reservedRooms} />
-              <DashboardCard title="Available Rooms" value={dashboardData.availableRooms} />
-            </div>
           </div>
         );
       case 'roomReservation':

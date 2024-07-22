@@ -38,6 +38,7 @@ const Sidebar = ({ setActiveComponent }) => {
             <span>Room Reservation</span>
           </button>
         </li>
+        
         <li className={styles.navItem}>
           <button 
             onClick={() => setActiveComponent('inventory')}

@@ -14,8 +14,8 @@ createDefaultAdmin();
 app.use('/auth', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
 app.use('/user', require('./routes/user'));
-app.use('/rooms', require('./routes/Room')); 
-app.use('/inventory', require('./routes/Inventory')); 
+app.use('/rooms', require('./routes/Room'));
+app.use('/inventory', require('./routes/Inventory'));
 
 const PORT = 5200;
 app.listen(PORT, () => {

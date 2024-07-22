@@ -9,26 +9,26 @@ const Inventory = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    const fetchRoomsAndInventory = async () => {
+      const token = localStorage.getItem('token'); 
       try {
-        const res = await axios.get('http://localhost:5200/rooms');
-        setRooms(res.data);
+        const [roomsRes, inventoryRes] = await Promise.all([
+          axios.get('http://localhost:5200/rooms', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get('http://localhost:5200/inventory', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        setRooms(roomsRes.data);
+        setInventoryItems(inventoryRes.data);
       } catch (err) {
-        console.error("Error fetching rooms:", err);
+        console.error("Error fetching data:", err);
+        setError("Failed to fetch data. Please try again later.");
       }
     };
 
-    const fetchInventoryItems = async () => {
-      try {
-        const res = await axios.get('http://localhost:5200/inventory');
-        setInventoryItems(res.data);
-      } catch (err) {
-        console.error("Error fetching inventory:", err);
-      }
-    };
-
-    fetchRooms();
-    fetchInventoryItems();
+    fetchRoomsAndInventory();
   }, []);
 
   const handleInputChange = (e) => {
@@ -38,12 +38,17 @@ const Inventory = () => {
 
   const handleInventorySubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token'); 
     try {
-      await axios.post('http://localhost:5200/inventory', inventoryData);
+      await axios.post('http://localhost:5200/inventory/add-item', inventoryData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success('Inventory item added successfully!');
       setInventoryData({ itemName: '', roomId: '', quantity: '' });
       // Refresh inventory items
-      const res = await axios.get('http://localhost:5200/inventory');
+      const res = await axios.get('http://localhost:5200/inventory', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setInventoryItems(res.data);
     } catch (err) {
       console.error("Error adding inventory:", err);
@@ -51,10 +56,16 @@ const Inventory = () => {
     }
   };
 
+  
+  const getRoomNumber = (roomId) => {
+    const room = rooms.find(room => room._id === roomId);
+    return room ? room.roomNo : 'Unknown';
+  };
+
   return (
-    <div className="p-6">
+    <div className="p-6 mt-16">
       <h3 className="text-xl mb-6 text-red-600">Add Inventory Item</h3>
-      {error && <p className="error text-red-500">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleInventorySubmit} className="mb-4">
         <div className="mb-4">
           <label className="block mb-1">Item Name:</label>
@@ -77,9 +88,13 @@ const Inventory = () => {
             className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
           >
             <option value="" disabled>Select a room</option>
-            {rooms.map(room => (
-              <option key={room._id} value={room._id}>{room.roomNo}</option>
-            ))}
+            {rooms.length > 0 ? (
+              rooms.map(room => (
+                <option key={room._id} value={room._id}>{room.roomNo}</option>
+              ))
+            ) : (
+              <option value="" disabled>No rooms available</option>
+            )}
           </select>
         </div>
         <div className="mb-4">
@@ -111,7 +126,7 @@ const Inventory = () => {
           {inventoryItems.map(item => (
             <tr key={item._id}>
               <td className="border px-4 py-2">{item.itemName}</td>
-              <td className="border px-4 py-2">{item.roomId}</td>
+              <td className="border px-4 py-2">{getRoomNumber(item.roomId)}</td>
               <td className="border px-4 py-2">{item.quantity}</td>
             </tr>
           ))}

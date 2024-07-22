@@ -2,32 +2,22 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
-import DashboardCard from './components/DashboardCard';
-import ReservationForm from './components/ReservationForm';
+import TotalAmountCard from './components/TotalAmountCard';
+import TotalRoomsCard from './components/TotalRoomsCard';
+import ReservedRoomsCard from './components/ReservedRoomsCard';
+import AvailableRoomsCard from './components/AvailableRoomsCard';
 import RoomDetails from './components/RoomDetails';
 import StaffDetails from './components/StaffDetails';
 import Inventory from './components/Inventory';
 import AddRoom from './components/AddRoom';
+import RoomReservation from './components/RoomReservation';
+import CleaningForm from './components/CleaningForm';
+import ReservedRooms from './components/ReservedRooms'; 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import RoomReservation from './components/RoomReservation';
 
 const AdminPanel = () => {
   const [activeComponent, setActiveComponent] = useState('dashboard');
-  const [dashboardData, setDashboardData] = useState({ totalAmount: 0, reservedRooms: 0, availableRooms: 0, totalRooms: 0 });
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const res = await axios.get('http://localhost:5200/dashboard');
-        setDashboardData(res.data);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
 
   const renderActiveComponent = () => {
     const componentStyle = "mt-4";
@@ -38,15 +28,16 @@ const AdminPanel = () => {
           <div className={componentStyle}>
             <h2 className="text-2xl mb-12">Dashboard</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-              <DashboardCard title="Total Amount" value={`$${dashboardData.totalAmount}`} />
-              <DashboardCard title="Total Rooms" value={dashboardData.totalRooms} />
-              <DashboardCard title="Reserved Rooms" value={dashboardData.reservedRooms} />
-              <DashboardCard title="Available Rooms" value={dashboardData.availableRooms} />
+              <TotalAmountCard />
+              <TotalRoomsCard />
+              <ReservedRoomsCard />
+              <AvailableRoomsCard />
             </div>
+            <ReservedRooms /> 
           </div>
         );
       case 'roomReservation':
-        return <div className={componentStyle}><RoomReservation/></div>;
+        return <div className={componentStyle}><RoomReservation /></div>;
       case 'roomDetails':
         return <div className={componentStyle}><RoomDetails /></div>;
       case 'staffDetails':
@@ -55,6 +46,10 @@ const AdminPanel = () => {
         return <div className={componentStyle}><Inventory /></div>;
       case 'addRoom':
         return <div className={componentStyle}><AddRoom /></div>;
+      case 'cleaningForm':
+        return <div className={componentStyle}><CleaningForm /></div>;
+      case 'reports':
+        return <div className={componentStyle}><Reports /></div>; 
       default:
         return null;
     }

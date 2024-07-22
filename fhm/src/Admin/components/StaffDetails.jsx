@@ -4,15 +4,14 @@ import axios from 'axios';
 const StaffDetails = () => {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const token = localStorage.getItem('token'); // Get the token from local storage
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchStaff = async () => {
       try {
         const res = await axios.get('http://localhost:5200/user', {
           headers: {
-            Authorization: `Bearer ${token}`, // Attach token
+            Authorization: `Bearer ${token}`,
           },
         });
         setStaff(res.data);
@@ -30,7 +29,7 @@ const StaffDetails = () => {
     try {
       await axios.delete(`http://localhost:5200/user/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Attach token
+          Authorization: `Bearer ${token}`,
         },
       });
       setStaff(staff.filter(member => member._id !== id));
@@ -39,14 +38,14 @@ const StaffDetails = () => {
     }
   };
 
-  const handleSetPending = async (id) => {
+  const handleStatusChange = async (id, status) => {
     try {
-      await axios.patch(`http://localhost:5200/user/${id}`, { status: 'pending' }, {
+      await axios.patch(`http://localhost:5200/user/${id}`, { status }, {
         headers: {
-          Authorization: `Bearer ${token}`, // Attach token
+          Authorization: `Bearer ${token}`,
         },
       });
-      setStaff(staff.map(member => member._id === id ? { ...member, status: 'pending' } : member));
+      setStaff(staff.map(member => member._id === id ? { ...member, status } : member));
     } catch (err) {
       console.error("Error updating staff status:", err);
     }
@@ -74,20 +73,21 @@ const StaffDetails = () => {
               <td className="border px-4 py-2 text-center">{member.name}</td>
               <td className="border px-4 py-2 text-center">{member.role}</td>
               <td className="border px-4 py-2 text-center">
-                {member.status === 'pending' ? 'Pending' : 'Active'}
+                <select
+                  value={member.status}
+                  onChange={(e) => handleStatusChange(member._id, e.target.value)}
+                  className="p-2 border rounded"
+                >
+                  <option value="active">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
               </td>
               <td className="border px-4 py-2 text-center">
                 <button 
-                  className="text-red-500" 
+                  className="text-red-500 hover:text-red-700" 
                   onClick={() => handleDelete(member._id)}
                 >
                   Delete
-                </button>
-                <button 
-                  className="ml-2 text-yellow-500" 
-                  onClick={() => handleSetPending(member._id)}
-                >
-                  Set Pending
                 </button>
               </td>
             </tr>

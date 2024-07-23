@@ -8,5 +8,6 @@ Register Screen
 
 
 Admin panel
-![Screenshot 2024-07-13 132545](https://github.com/user-attachments/assets/d0fcc1b2-c6fd-421c-856d-1a15b5cd3912)
+![Screenshot 2024-07-22 121733](https://github.com/user-attachments/assets/b5abd97e-a5c2-43a8-a06e-773006905a37)
+
 

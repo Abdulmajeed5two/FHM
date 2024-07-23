@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-
+// Get user profile
 router.get('/profile', authMiddleware(['admin', 'receptionist', 'staff']), async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
@@ -18,7 +18,7 @@ router.get('/profile', authMiddleware(['admin', 'receptionist', 'staff']), async
   }
 });
 
-
+// Get all users
 router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -29,7 +29,7 @@ router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   }
 });
 
-
+// Get user details by ID
 router.get('/:id', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
@@ -44,18 +44,20 @@ router.get('/:id', authMiddleware(['admin', 'staff']), async (req, res) => {
 });
 
 
-router.put('/:id', authMiddleware(['admin', 'staff']), async (req, res) => {
+router.patch('/:id', authMiddleware(['admin']), async (req, res) => {
+  const { status } = req.body;
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, { status }, { new: true, runValidators: true }).select('-password');
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found.' });
     }
     res.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: 'Failed to update user.' });
+    console.error("Error updating user status:", error);
+    res.status(500).json({ message: 'Failed to update user status.' });
   }
 });
+
 
 router.delete('/:id', authMiddleware(['admin']), async (req, res) => {
   try {

@@ -11,24 +11,24 @@ const TotalAmountCard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token'); 
+        const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No token found in localStorage');
         }
-        console.log('Token:', token);
+
         const response = await axios.get('http://localhost:5200/rooms/total-amount', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log('Response:', response.data);
+
         if (response.data && typeof response.data.value === 'number') {
           setValue(response.data.value);
         } else {
           throw new Error('Unexpected response format');
         }
       } catch (err) {
-        setError('Error fetching data');
+        setError('Failed to fetch the total amount. Please try again later.');
         console.error('Error fetching total amount:', err);
       } finally {
         setLoading(false);

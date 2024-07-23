@@ -5,11 +5,11 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const CleaningForm = () => {
   const [roomNumber, setRoomNumber] = useState('');
-  const [cleanedStatus, setCleanedStatus] = useState('no');
+  const [cleanedStatus, setCleanedStatus] = useState('cleaned'); 
   const [rooms, setRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const token = localStorage.getItem('token'); 
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetchRooms();
@@ -18,9 +18,9 @@ const CleaningForm = () => {
   const fetchRooms = async () => {
     try {
       const res = await axios.get('http://localhost:5200/rooms', {
-        headers: { Authorization: `Bearer ${token}` } 
+        headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('Fetched rooms:', res.data); 
+      console.log('Fetched rooms:', res.data);
       setRooms(res.data);
     } catch (err) {
       console.error("Error fetching rooms:", err);
@@ -30,18 +30,18 @@ const CleaningForm = () => {
 
   const handleCleaningUpdate = async (e) => {
     e.preventDefault();
-    const endpoint = cleanedStatus === 'yes' ? '/clean' : '/unclean';
-    const url = `http://localhost:5200/cleaning${endpoint}`;
+    const url = `http://localhost:5200/rooms/update-cleaning-status`;
 
     try {
       const response = await axios.post(url, {
         roomNo: roomNumber,
+        cleaningStatus: cleanedStatus
       }, {
-        headers: { Authorization: `Bearer ${token}` } 
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.status === 200) {
-        toast.success(`Room marked as ${cleanedStatus === 'yes' ? 'cleaned' : 'uncleaned'} successfully!`);
+        toast.success(`Room marked as cleaned successfully!`);
         resetForm();
         fetchRooms();
         setIsModalOpen(false);
@@ -49,14 +49,14 @@ const CleaningForm = () => {
         throw new Error('Unexpected response status');
       }
     } catch (err) {
-      console.error(`Error marking room as ${cleanedStatus === 'yes' ? 'cleaned' : 'uncleaned'}:`, err.response ? err.response.data : err.message);
-      toast.error(`Failed to mark room as ${cleanedStatus === 'yes' ? 'cleaned' : 'uncleaned'}. Please try again later.`);
+      console.error(`Error marking room as cleaned:`, err.response ? err.response.data : err.message);
+      toast.error(`Failed to mark room as cleaned. Please try again later.`);
     }
   };
 
   const resetForm = () => {
     setRoomNumber('');
-    setCleanedStatus('no');
+    setCleanedStatus('cleaned');
   };
 
   const filteredRooms = rooms.filter(room =>
@@ -114,8 +114,8 @@ const CleaningForm = () => {
                   required
                   className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
                 >
-                  <option value="no">No</option>
-                  <option value="yes">Yes</option>
+                  <option value="cleaned">cleaned</option>
+                  <option value="uncleaned">uncleaned</option>
                 </select>
               </div>
               <div className="flex justify-end">

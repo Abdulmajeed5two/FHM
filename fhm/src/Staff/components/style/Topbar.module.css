@@ -1,0 +1,91 @@
+.topbar {
+  position: fixed;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  margin-left: 256px; 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.topbarLight {
+  background-color: #f56565; 
+}
+
+.topbarDark {
+  background-color: #2d3748; 
+}
+
+.button {
+  color: white;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.buttonLight:hover {
+  background-color: #c53030;
+  transform: scale(1.1);
+}
+
+.buttonDark:hover {
+  background-color: #4a5568; 
+  transform: scale(1.1);
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem; 
+  width: 12rem; 
+  background-color: white;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 0;
+  transform: scale(1);
+  transform-origin: top right;
+  transition: transform 0.3s ease-in-out;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #4a5568; 
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.dropdownItem:hover {
+  background-color: #edf2f7; 
+  transform: scale(1.05);
+}
+
+.dropdownItemDark {
+  color: #e2e8f0; 
+}
+
+.dropdownItemDark:hover {
+  background-color: #2d3748;
+  transform: scale(1.05);
+}
+
+.errorMessage {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  background-color: #f56565; 
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

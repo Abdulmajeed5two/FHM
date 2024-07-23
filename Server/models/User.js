@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   gender: String,
   password: String,
   role: { type: String, enum: ['admin', 'staff'], default: 'staff' },
-  isApproved: { type: Boolean, default: false },
+  status: { type: String, enum: ['active', 'pending'], default: 'pending' },
 });
 
 module.exports = mongoose.model('User', userSchema);

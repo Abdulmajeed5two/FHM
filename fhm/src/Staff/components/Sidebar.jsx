@@ -5,8 +5,33 @@ import styles from './style/Sidebar.module.css';
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ setActiveComponent }) => {
+  const [isRoomDropdownOpen, setIsRoomDropdownOpen] = useState(false);
+  const [isCleaningDropdownOpen, setIsCleaningDropdownOpen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role'));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await axios.get('http://localhost:5200/rooms', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        // You might want to handle the fetched rooms here if needed
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  const toggleRoomDropdown = () => {
+    setIsRoomDropdownOpen(!isRoomDropdownOpen);
+  };
+
+  const toggleCleaningDropdown = () => {
+    setIsCleaningDropdownOpen(!isCleaningDropdownOpen);
+  };
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -38,7 +63,31 @@ const Sidebar = ({ setActiveComponent }) => {
             <span>Room Reservation</span>
           </button>
         </li>
-        
+        <li className={styles.navItem}>
+          <div>
+            <button 
+              onClick={toggleCleaningDropdown} 
+              className={styles.button}
+            >
+              <i className={`${styles.icon} zmdi zmdi-clean zmdi-hc-lg`}></i>
+              <span>Room Cleaning</span>
+              <i className={`zmdi zmdi-caret-${isCleaningDropdownOpen ? 'up' : 'down'} zmdi-hc-lg ml-auto`}></i>
+            </button>
+            <div className={`${styles.dropdown} ${isCleaningDropdownOpen ? styles.dropdownOpen : ''}`}>
+              <ul className={styles.dropdownList}>
+                <li className={styles.dropdownItem}>
+                  <button 
+                    onClick={() => setActiveComponent('cleaningForm')}
+                    className={styles.dropdownButton}
+                  >
+                    <i className={`${styles.icon} zmdi zmdi-plus zmdi-hc-lg`}></i>
+                    <span>Add Cleaning</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
         <li className={styles.navItem}>
           <button 
             onClick={() => setActiveComponent('inventory')}

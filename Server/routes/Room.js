@@ -4,6 +4,7 @@ const Room = require('../models/Room');
 
 const router = express.Router();
 
+
 router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
   const { roomNo, type, amount, inventoryStatus } = req.body;
 
@@ -22,7 +23,7 @@ router.post('/add-room', authMiddleware(['admin']), async (req, res) => {
       roomNo: roomNoWithPrefix, 
       type, 
       amount: amount || 0, 
-      inventoryStatus: inventoryStatus || 'good' 
+      inventoryStatus: inventoryStatus || 'empty' 
     });
     await newRoom.save();
     res.status(201).json({ message: 'Room added successfully.' });
@@ -51,7 +52,7 @@ router.post('/reserve-room', authMiddleware(['admin', 'staff']), async (req, res
       return res.status(400).json({ message: 'Room is already reserved.' });
     }
 
-    if (room.cleaningStatus !== 'cleaned' || room.inventoryStatus !== 'good') {
+    if (room.cleaningStatus !== 'cleaned' || room.inventoryStatus !== 'added') {
       return res.status(400).json({ message: 'Room is not available due to maintenance or inventory issues.' });
     }
 
@@ -95,6 +96,7 @@ router.post('/checkout-room', authMiddleware(['admin', 'staff']), async (req, re
     room.checkOutDate = null;
     room.amount = null;
     room.cleaningStatus = 'uncleaned'; 
+    room.inventoryStatus = 'empty'; 
 
     await room.save();
 
@@ -105,7 +107,7 @@ router.post('/checkout-room', authMiddleware(['admin', 'staff']), async (req, re
   }
 });
 
-// Delete a room
+
 router.delete('/:roomNo', authMiddleware(['admin']), async (req, res) => {
   const { roomNo } = req.params;
 
@@ -186,7 +188,7 @@ router.get('/reserved-rooms', authMiddleware(['admin', 'staff']), async (req, re
 
 router.get('/available-rooms', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
-    const availableRooms = await Room.countDocuments({ status: 'available', cleaningStatus: 'cleaned', inventoryStatus: 'good' });
+    const availableRooms = await Room.countDocuments({ status: 'available', cleaningStatus: 'cleaned', inventoryStatus: 'added' });
     res.json({ value: availableRooms });
   } catch (err) {
     console.error("Error fetching available rooms:", err);
@@ -217,6 +219,32 @@ router.post('/update-cleaning-status', authMiddleware(['admin', 'staff']), async
   } catch (err) {
     console.error("Error updating cleaning status:", err);
     res.status(500).json({ message: 'Failed to update cleaning status. Please try again later.' });
+  }
+});
+
+
+router.post('/update-inventory-status', authMiddleware(['admin', 'staff']), async (req, res) => {
+  const { roomNo, inventoryStatus } = req.body;
+
+  if (!roomNo || !inventoryStatus) {
+    return res.status(400).json({ message: 'Room number and inventory status are required.' });
+  }
+
+  try {
+    const room = await Room.findOne({ roomNo });
+
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found.' });
+    }
+
+    room.inventoryStatus = inventoryStatus;
+
+    await room.save();
+
+    res.status(200).json({ message: `Room inventory status updated to ${inventoryStatus}.` });
+  } catch (err) {
+    console.error("Error updating inventory status:", err);
+    res.status(500).json({ message: 'Failed to update inventory status. Please try again later.' });
   }
 });
 

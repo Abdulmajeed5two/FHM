@@ -1,139 +1,168 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Inventory = () => {
-  const [inventoryData, setInventoryData] = useState({ itemName: '', roomId: '', quantity: '' });
-  const [error, setError] = useState(null);
+const InventoryForm = () => {
+  const [roomNumber, setRoomNumber] = useState('');
+  const [inventoryStatus, setInventoryStatus] = useState('added'); 
   const [rooms, setRooms] = useState([]);
-  const [inventoryItems, setInventoryItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const fetchRoomsAndInventory = async () => {
-      const token = localStorage.getItem('token'); 
-      try {
-        const [roomsRes, inventoryRes] = await Promise.all([
-          axios.get('http://localhost:5200/rooms', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get('http://localhost:5200/inventory', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-        setRooms(roomsRes.data);
-        setInventoryItems(inventoryRes.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to fetch data. Please try again later.");
-      }
-    };
-
-    fetchRoomsAndInventory();
+    fetchRooms();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setInventoryData({ ...inventoryData, [name]: value });
-  };
-
-  const handleInventorySubmit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token'); 
+  const fetchRooms = async () => {
     try {
-      await axios.post('http://localhost:5200/inventory/add-item', inventoryData, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await axios.get('http://localhost:5200/rooms', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Inventory item added successfully!');
-      setInventoryData({ itemName: '', roomId: '', quantity: '' });
-      // Refresh inventory items
-      const res = await axios.get('http://localhost:5200/inventory', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setInventoryItems(res.data);
+      setRooms(res.data);
     } catch (err) {
-      console.error("Error adding inventory:", err);
-      setError("Failed to add inventory. Please try again later.");
+      console.error("Error fetching rooms:", err);
+      toast.error("Failed to fetch rooms. Please try again later.");
     }
   };
 
-  
-  const getRoomNumber = (roomId) => {
-    const room = rooms.find(room => room._id === roomId);
-    return room ? room.roomNo : 'Unknown';
+  const handleInventoryUpdate = async (e) => {
+    e.preventDefault();
+    const url = `http://localhost:5200/rooms/update-inventory-status`;
+
+    try {
+      const response = await axios.post(url, {
+        roomNo: roomNumber,
+        inventoryStatus
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.status === 200) {
+        toast.success('Room inventory status updated successfully!');
+        resetForm();
+        fetchRooms();
+        setIsModalOpen(false);
+      } else {
+        throw new Error('Unexpected response status');
+      }
+    } catch (err) {
+      console.error(`Error updating room inventory status:`, err.response ? err.response.data : err.message);
+      toast.error('Failed to update room inventory status. Please try again later.');
+    }
   };
 
-  return (
-    <div className="p-6 mt-16">
-      <h3 className="text-xl mb-6 text-red-600">Add Inventory Item</h3>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleInventorySubmit} className="mb-4">
-        <div className="mb-4">
-          <label className="block mb-1">Item Name:</label>
-          <input 
-            type="text" 
-            name="itemName" 
-            value={inventoryData.itemName} 
-            onChange={handleInputChange} 
-            required 
-            className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Room:</label>
-          <select 
-            name="roomId" 
-            value={inventoryData.roomId} 
-            onChange={handleInputChange} 
-            required 
-            className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
-          >
-            <option value="" disabled>Select a room</option>
-            {rooms.length > 0 ? (
-              rooms.map(room => (
-                <option key={room._id} value={room._id}>{room.roomNo}</option>
-              ))
-            ) : (
-              <option value="" disabled>No rooms available</option>
-            )}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Quantity:</label>
-          <input 
-            type="number" 
-            name="quantity" 
-            value={inventoryData.quantity} 
-            onChange={handleInputChange} 
-            required 
-            className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
-          />
-        </div>
-        <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">
-          Add Inventory
-        </button>
-      </form>
+  const resetForm = () => {
+    setRoomNumber('');
+    setInventoryStatus('added');
+  };
 
-      <h3 className="text-lg mb-4 text-red-600">Current Inventory Items</h3>
-      <table className="min-w-full border">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">Item Name</th>
-            <th className="border px-4 py-2">Room No</th>
-            <th className="border px-4 py-2">Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {inventoryItems.map(item => (
-            <tr key={item._id}>
-              <td className="border px-4 py-2">{item.itemName}</td>
-              <td className="border px-4 py-2">{getRoomNumber(item.roomId)}</td>
-              <td className="border px-4 py-2">{item.quantity}</td>
+  const filteredRooms = rooms.filter(room =>
+    room.roomNo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const availableRooms = rooms.filter(room => room.inventoryStatus !== 'added');
+
+  return (
+    <div className="mt-24">
+      <ToastContainer />
+      <h2 className="text-2xl mb-4 text-center">Room Inventory Status</h2>
+      <div className="flex justify-center mb-4">
+        <input
+          type="text"
+          placeholder="Search for room..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border-b w-1/2 h-10 text-sm px-2 focus:outline-none focus:border-red-600 transition-colors duration-300"
+        />
+      </div>
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 transition duration-300"
+        >
+          Update Inventory Status
+        </button>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
+            <h2 className="text-xl mb-4 text-center">Update Inventory Status</h2>
+            <form onSubmit={handleInventoryUpdate} className="space-y-4">
+              <div>
+                <label className="block mb-1">Room Number:</label>
+                <select
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  required
+                  className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
+                >
+                  <option value="">Select Room</option>
+                  {availableRooms.map((room) => (
+                    <option key={room.roomNo} value={room.roomNo}>
+                      {room.roomNo} - {room.type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1">Inventory Status:</label>
+                <select
+                  value={inventoryStatus}
+                  onChange={(e) => setInventoryStatus(e.target.value)}
+                  required
+                  className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
+                >
+                  <option value="added">Added</option>
+                  <option value="empty">Empty</option>
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition duration-300 mr-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className="overflow-x-auto w-full">
+        <table className="w-full border-collapse bg-white border-separate border-spacing-2 border border-red-500">
+          <thead>
+            <tr className="bg-red-200">
+              <th className="p-3 border-b">Room Number</th>
+              <th className="p-3 border-b">Type</th>
+              <th className="p-3 border-b">Status</th>
+              <th className="p-3 border-b">Inventory Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredRooms.map(room => (
+              <tr key={room.roomNo} className="border-b hover:bg-gray-100 text-center">
+                <td className="p-3">{room.roomNo}</td>
+                <td className="p-3">{room.type}</td>
+                <td className="p-3">{room.status}</td>
+                <td className="p-3">{room.inventoryStatus || 'empty'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default Inventory;
+export default InventoryForm;

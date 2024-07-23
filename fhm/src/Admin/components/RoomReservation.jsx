@@ -239,7 +239,7 @@ const RoomReservation = () => {
       )}
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
+        <table className="w-full border-collapse bg-white border-separate border-spacing-2 border border-red-500">
           <thead>
             <tr className="border-b border-gray-300">
               <th className="py-2 px-4 ">Room Number</th>
@@ -248,6 +248,8 @@ const RoomReservation = () => {
               <th className="py-2 px-4 ">Check-In Date</th>
               <th className="py-2 px-4 ">Check-Out Date</th>
               <th className="py-2 px-4 ">Amount</th>
+              <th className="py-2 px-4">Cleaning Status</th>
+              <th className="py-2 px-4">Inventory Status</th>
               <th className="py-2 px-4 ">Actions</th>
             </tr>
           </thead>
@@ -260,6 +262,8 @@ const RoomReservation = () => {
                 <td className="py-2 px-4">{room.checkInDate ? new Date(room.checkInDate).toLocaleDateString() : '-'}</td>
                 <td className="py-2 px-4">{room.checkOutDate ? new Date(room.checkOutDate).toLocaleDateString() : '-'}</td>
                 <td className="py-2 px-4">${room.amount || '-'}</td>
+                <td className="p-3">{room.cleaningStatus || 'uncleaned'}</td>
+                <td className="p-3">{room.inventoryStatus || 'empty'}</td>
                 <td className="py-2 px-4">
                   {room.status === 'reserved' ? (
                     <button

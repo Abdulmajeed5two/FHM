@@ -10,7 +10,7 @@ const roomSchema = new mongoose.Schema({
   checkInDate: { type: Date, default: null },
   checkOutDate: { type: Date, default: null },
   amount: { type: Number, default: 0 }, 
-  inventoryStatus: { type: String, default: 'good' } 
+  inventoryStatus: { type: String, default: 'empty' } 
 });
 
 module.exports = mongoose.model('Room', roomSchema);

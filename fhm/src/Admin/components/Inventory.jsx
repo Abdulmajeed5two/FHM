@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../components/style/st.css'
 
 const InventoryForm = () => {
   const [roomNumber, setRoomNumber] = useState('');
-  const [inventoryStatus, setInventoryStatus] = useState('added'); 
+  const [inventoryStatus, setInventoryStatus] = useState('added');
   const [rooms, setRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -21,10 +23,23 @@ const InventoryForm = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRooms(res.data);
+      initializeCheckedItems(res.data); 
     } catch (err) {
       console.error("Error fetching rooms:", err);
       toast.error("Failed to fetch rooms. Please try again later.");
     }
+  };
+
+  const initializeCheckedItems = (rooms) => {
+    const items = {};
+    rooms.forEach(room => {
+      items[room.roomNo] = {
+        'Bed Sheet': room.inventoryStatus === 'added',
+        'Towels': room.inventoryStatus === 'added',
+        'Toiletries': room.inventoryStatus === 'added'
+      };
+    });
+    setCheckedItems(items);
   };
 
   const handleInventoryUpdate = async (e) => {
@@ -41,6 +56,14 @@ const InventoryForm = () => {
 
       if (response.status === 200) {
         toast.success('Room inventory status updated successfully!');
+        setCheckedItems(prev => ({
+          ...prev,
+          [roomNumber]: {
+            'Bed Sheet': inventoryStatus === 'added',
+            'Towels': inventoryStatus === 'added',
+            'Toiletries': inventoryStatus === 'added'
+          }
+        }));
         resetForm();
         fetchRooms();
         setIsModalOpen(false);
@@ -56,6 +79,16 @@ const InventoryForm = () => {
   const resetForm = () => {
     setRoomNumber('');
     setInventoryStatus('added');
+  };
+
+  const handleCheckboxChange = (roomNo, item) => {
+    setCheckedItems(prev => ({
+      ...prev,
+      [roomNo]: {
+        ...prev[roomNo],
+        [item]: !prev[roomNo]?.[item]
+      }
+    }));
   };
 
   const filteredRooms = rooms.filter(room =>
@@ -147,6 +180,7 @@ const InventoryForm = () => {
               <th className="p-3 border-b">Type</th>
               <th className="p-3 border-b">Status</th>
               <th className="p-3 border-b">Inventory Status</th>
+              <th className="p-3 border-b">Items</th>
             </tr>
           </thead>
           <tbody>
@@ -156,6 +190,21 @@ const InventoryForm = () => {
                 <td className="p-3">{room.type}</td>
                 <td className="p-3">{room.status}</td>
                 <td className="p-3">{room.inventoryStatus || 'empty'}</td>
+                <td className="p-3">
+                  <div className="flex flex-col items-start">
+                    {['Bed Sheet', 'Towels', 'Toiletries'].map(item => (
+                      <label key={item} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          checked={checkedItems[room.roomNo]?.[item] || false}
+                          onChange={() => handleCheckboxChange(room.roomNo, item)}
+                        />
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

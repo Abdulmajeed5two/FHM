@@ -4,7 +4,6 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Get user profile
 router.get('/profile', authMiddleware(['admin', 'receptionist', 'staff']), async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
@@ -18,7 +17,6 @@ router.get('/profile', authMiddleware(['admin', 'receptionist', 'staff']), async
   }
 });
 
-// Get all users
 router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -29,7 +27,6 @@ router.get('/', authMiddleware(['admin', 'staff']), async (req, res) => {
   }
 });
 
-// Get user details by ID
 router.get('/:id', authMiddleware(['admin', 'staff']), async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');

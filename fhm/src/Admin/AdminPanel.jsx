@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import TotalAmountCard from './components/TotalAmountCard';
@@ -13,6 +12,7 @@ import AddRoom from './components/AddRoom';
 import RoomReservation from './components/RoomReservation';
 import CleaningForm from './components/CleaningForm';
 import ReservedRooms from './components/ReservedRooms'; 
+import Reports from './components/Reports';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

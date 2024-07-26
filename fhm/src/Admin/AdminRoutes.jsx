@@ -8,6 +8,7 @@ import Inventory from './components/Inventory';
 import AddRoom from './components/AddRoom'; 
 import ProtectedRoute from '../components/ProtectedRoute';
 import CleaningForm from './components/CleaningForm';
+import Reports from './components/Reports';
 
 const AdminRoutes = () => {
   return (
@@ -19,6 +20,7 @@ const AdminRoutes = () => {
       <Route path="/inventory" element={<ProtectedRoute role="admin"><Inventory /></ProtectedRoute>} />
       <Route path="/add-room" element={<ProtectedRoute role="admin"><AddRoom /></ProtectedRoute>} />
       <Route path="/cleaning-form" element={<ProtectedRoute role="admin"><CleaningForm /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute role="admin"><Reports /></ProtectedRoute>} />
     </Routes>
   );
 };

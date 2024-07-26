@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const CleaningForm = () => {
   const [roomNumber, setRoomNumber] = useState('');
-  const [cleanedStatus, setCleanedStatus] = useState('cleaned'); 
+  const [cleanedStatus, setCleanedStatus] = useState('cleaned');
   const [rooms, setRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,6 +63,8 @@ const CleaningForm = () => {
     room.roomNo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const roomsToUpdate = filteredRooms.filter(room => room.cleaningStatus !== 'cleaned');
+
   return (
     <div className="mt-24">
       <ToastContainer />
@@ -99,7 +101,7 @@ const CleaningForm = () => {
                   className="border-b w-full h-10 text-sm px-0 focus:outline-none focus:border-red-600 transition-colors duration-300"
                 >
                   <option value="">Select Room</option>
-                  {rooms.map((room) => (
+                  {roomsToUpdate.map((room) => (
                     <option key={room.roomNo} value={room.roomNo}>
                       {room.roomNo} - {room.type}
                     </option>

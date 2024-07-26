@@ -17,7 +17,7 @@ router.post('/register', async (req, res) => {
       gender,
       password: hashedPassword,
       role,
-      status: 'pending', // default status
+      status: 'pending', 
     });
     await newUser.save();
     res.status(201).json({ message: 'User registered. Waiting for approval.' });
